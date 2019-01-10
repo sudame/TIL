@@ -47,4 +47,12 @@ class UsersEditTest < ActionDispatch::IntegrationTest
     assert_equal email, @user.email
   end
 
+  test "should redirect default when re-login" do
+    get edit_user_path(@user)
+    log_in_as(@user)
+    assert_redirected_to edit_user_path(@user)
+    delete logout_path
+    log_in_as(@user)
+    assert session[:forwarding_url].nil?
+  end
 end
