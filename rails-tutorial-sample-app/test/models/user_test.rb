@@ -94,7 +94,7 @@ class UserTest < ActiveSupport::TestCase
       assert michael.feed.include?(post_self)
     end
 
-    archer.micropost.each do |post_unfollowed|
+    archer.microposts.each do |post_unfollowed|
       assert_not michael.feed.include?(post_unfollowed)
     end
   end
