@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+Faker::Config.locale = :ja
+
 User.create!(name: 'Example User',
              email: 'example@railstutorial.org',
              password: 'foobar',
