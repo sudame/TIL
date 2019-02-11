@@ -1,6 +1,8 @@
 from __future__ import division
 from matplotlib import pyplot as plt
 from collections import Counter
+from _04_linear_algebra import vector, matrix
+import math
 
 num_friends = [
     100,
@@ -217,7 +219,7 @@ plt.axis([0, 101, 0, 25])
 plt.title("Histogram of Friend Counts")
 plt.xlabel("# of friends")
 plt.ylabel("# of people")
-plt.show()
+# plt.show()
 
 
 num_points = len(num_friends)
@@ -278,3 +280,45 @@ def mode(x):
 
 m = mode(num_friends)
 print(m)
+
+
+# 5.1.2 散らばり
+
+
+def data_range(x):
+    return max(x) - min(x)
+
+
+dr = data_range(num_friends)
+print(dr)
+
+
+def de_mean(x):
+    x_bar = mean(x)
+    return [x_i - x_bar for x_i in x]
+
+
+def variance(x):
+    n = len(x)
+    deviations = de_mean(x)
+    return vector.sum_of_squares(deviations) / (n - 1)
+
+
+v = variance(num_friends)
+print(v)
+
+
+def standard_deviation(x):
+    return math.sqrt(variance(x))
+
+
+sd = standard_deviation(num_friends)
+print(sd)
+
+
+def interquartile_range(x):
+    return quantile(x, 0.75) - quantile(x, 0.25)
+
+
+ir = interquartile_range(num_friends)
+print(ir)
