@@ -253,3 +253,28 @@ def median(v):
 
 m = median(num_friends)
 print(m)
+
+
+def quantile(x, p):
+    p_index = int(p * len(x))
+    return sorted(x)[p_index]
+
+
+q_1 = quantile(num_friends, 0.10)
+q_2 = quantile(num_friends, 0.25)
+q_3 = quantile(num_friends, 0.75)
+q_4 = quantile(num_friends, 0.90)
+print(q_1)
+print(q_2)
+print(q_3)
+print(q_4)
+
+
+def mode(x):
+    counts = Counter(x)
+    max_count = max(counts.values())
+    return [x_i for x_i, count in counts.items() if count == max_count]
+
+
+m = mode(num_friends)
+print(m)
