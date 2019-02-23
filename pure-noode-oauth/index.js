@@ -1,4 +1,9 @@
 const http = require('http');
+const keys = require('./keys.json');
+
+const CLIENT_ID = keys.clientID;
+const CLIENT_SECRET = keys.clientSecret;
+
 const server = http.createServer((req, res) => {
   switch (req.url) {
     case '/':
