@@ -8,6 +8,56 @@ const keys = require('./keys.json');
 const CLIENT_ID = keys.clientID;
 const CLIENT_SECRET = keys.clientSecret;
 
+
+function getEmail(access_token, res) {
+  let data = '';
+
+  const reqBodyToGitHub = queryString.stringify({
+    access_token: access_token
+  });
+
+  const reqToGitHubOptions = {
+    protocol: 'https:',
+    host: 'api.github.com',
+    port: '443',
+    path: `/user/emails?${reqBodyToGitHub}`,
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(reqBodyToGitHub),
+      'User-Agent': 'hoge'
+    }
+  };
+
+  const reqToGitHub = https.request(reqToGitHubOptions, (resFromGitHub) => {
+    resFromGitHub.setEncoding('utf8');
+
+    resFromGitHub.on('data', (d) => {
+      data += d;
+      console.log(d);
+    });
+
+    resFromGitHub.on('end', () => {
+      data = JSON.parse(data);
+      let emails = [];
+      data.forEach(el => {
+        emails.push(el.email);
+      });
+
+
+      res.writeHead(200);
+      res.end(emails.toString());
+    });
+  });
+
+  reqToGitHub.on('error', (e) => {
+    console.error(`[E]: ${e.message}`);
+  })
+
+  reqToGitHub.write(reqBodyToGitHub);
+  reqToGitHub.end();
+}
+
 const server = http.createServer((req, res) => {
   const reqURL = url.parse(req.url);
   const reqPathName = reqURL.pathname;
@@ -20,9 +70,9 @@ const server = http.createServer((req, res) => {
       });
       res.writeHead(303, { 'Location': `https://github.com/login/oauth/authorize?${requrestBody}` });
       res.end();
+      break;
     case '/callback':
 
-      console.log(queryString.parse(reqURL.query).code);
       const requestBody = queryString.stringify({
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
@@ -40,20 +90,18 @@ const server = http.createServer((req, res) => {
           'Content-Length': requestBody.length
         },
       }, (responseClient) => {
-        console.log(responseClient.statusCode);
         responseClient.setEncoding('utf8');
         responseClient.on('data', (d) => {
-          console.log(queryString.parse(d));
+          getEmail(queryString.parse(d).access_token, res);
         })
       });
 
       requestClient.write(requestBody);
-
-      res.writeHead(200);
-      res.end();
+      break;
     default:
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end();
+      break;
   }
 });
 
