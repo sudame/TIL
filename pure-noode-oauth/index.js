@@ -10,7 +10,7 @@ const CLIENT_SECRET = keys.clientSecret;
 
 
 function getEmail(access_token, res) {
-  let data = '';
+  let resBodyFromGitHub = '';
 
   const reqBodyToGitHub = queryString.stringify({
     access_token: access_token
@@ -33,13 +33,13 @@ function getEmail(access_token, res) {
     resFromGitHub.setEncoding('utf8');
 
     resFromGitHub.on('data', (d) => {
-      data += d;
+      responseBodyFromGitHub += d;
     });
 
     resFromGitHub.on('end', () => {
       res.writeHead(200);
-      data = JSON.parse(data);
-      data.forEach((el, idx) => {
+      resBodyFromGitHub = JSON.parse(resBodyFromGitHub);
+      resBodyFromGitHub.forEach((el, idx) => {
         res.write(`mails[${idx}]: ${el.email}\n`);
       });
       res.end();
