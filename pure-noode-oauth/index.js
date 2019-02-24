@@ -10,48 +10,51 @@ const CLIENT_SECRET = keys.clientSecret;
 
 
 function getEmail(access_token, res) {
-  let resBodyFromGitHub = '';
+  return new Promise((resolve, reject) => {
+    let resBodyFromGitHub = '';
 
-  const reqBodyToGitHub = queryString.stringify({
-    access_token: access_token
-  });
-
-  const reqToGitHubOptions = {
-    protocol: 'https:',
-    host: 'api.github.com',
-    port: '443',
-    path: `/user/emails?${reqBodyToGitHub}`,
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': Buffer.byteLength(reqBodyToGitHub),
-      'User-Agent': 'pure-node-oauth'
-    }
-  };
-
-  const reqToGitHub = https.request(reqToGitHubOptions, (resFromGitHub) => {
-    resFromGitHub.setEncoding('utf8');
-
-    resFromGitHub.on('data', (d) => {
-      responseBodyFromGitHub += d;
+    const reqBodyToGitHub = queryString.stringify({
+      access_token: access_token
     });
 
-    resFromGitHub.on('end', () => {
-      res.writeHead(200);
-      resBodyFromGitHub = JSON.parse(resBodyFromGitHub);
-      resBodyFromGitHub.forEach((el, idx) => {
-        res.write(`mails[${idx}]: ${el.email}\n`);
+    const reqToGitHubOptions = {
+      protocol: 'https:',
+      host: 'api.github.com',
+      port: '443',
+      path: `/user/emails?${reqBodyToGitHub}`,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(reqBodyToGitHub),
+        'User-Agent': 'pure-node-oauth'
+      }
+    };
+
+    const reqToGitHub = https.request(reqToGitHubOptions, (resFromGitHub) => {
+      resFromGitHub.setEncoding('utf8');
+
+      resFromGitHub.on('data', (d) => {
+        resBodyFromGitHub += d;
       });
-      res.end();
+
+      resFromGitHub.on('end', () => {
+        res.writeHead(200);
+        resBodyFromGitHub = JSON.parse(resBodyFromGitHub);
+        resBodyFromGitHub.forEach((el, idx) => {
+          res.write(`mails[${idx}]: ${el.email}\n`);
+        });
+        resolve(res);
+      });
     });
+
+    reqToGitHub.on('error', (e) => {
+      console.error(`[E]: ${e.message}`);
+      reject(e);
+    })
+
+    reqToGitHub.write(reqBodyToGitHub);
+    reqToGitHub.end();
   });
-
-  reqToGitHub.on('error', (e) => {
-    console.error(`[E]: ${e.message}`);
-  })
-
-  reqToGitHub.write(reqBodyToGitHub);
-  reqToGitHub.end();
 }
 
 const server = http.createServer((req, res) => {
@@ -88,7 +91,9 @@ const server = http.createServer((req, res) => {
       }, (responseClient) => {
         responseClient.setEncoding('utf8');
         responseClient.on('data', (d) => {
-          getEmail(queryString.parse(d).access_token, res);
+          getEmail(queryString.parse(d).access_token, res).then(() => {
+            res.end();
+          });
         })
       });
 
