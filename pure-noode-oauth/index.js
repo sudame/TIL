@@ -115,20 +115,20 @@ const server = http.createServer((req, res) => {
       res.writeHead(303, { 'Location': `https://github.com/login/oauth/authorize?${requrestBody}` });
       res.end();
       break;
+
     case '/callback':
-
       const tempCode = queryString.parse(reqURL.query).code;
-
       getAccessToken(tempCode).then((accessToken) => {
         return getEmail(accessToken);
       }).then((emails) => {
         res.writeHead(200);
-        emails.forEach((el, idx) => {
-          res.write(`emails[${idx}]: ${el}\n`);
+        emails.forEach((email, index) => {
+          res.write(`emails[${index}]: ${email}\n`);
         })
         res.end();
       });
       break;
+
     default:
       res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end();
