@@ -34,7 +34,6 @@ function getEmail(access_token, res) {
 
     resFromGitHub.on('data', (d) => {
       data += d;
-      console.log(d);
     });
 
     resFromGitHub.on('end', () => {
