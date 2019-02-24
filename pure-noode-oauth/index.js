@@ -25,7 +25,7 @@ function getEmail(access_token, res) {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Content-Length': Buffer.byteLength(reqBodyToGitHub),
-      'User-Agent': 'hoge'
+      'User-Agent': 'pure-node-oauth'
     }
   };
 
