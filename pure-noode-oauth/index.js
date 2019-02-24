@@ -9,7 +9,7 @@ const CLIENT_ID = keys.clientID;
 const CLIENT_SECRET = keys.clientSecret;
 
 
-const getEmail = (access_token, res) => {
+const getEmail = (access_token) => {
   return new Promise((resolve, reject) => {
     let resBodyFromGitHub = '';
 
@@ -38,12 +38,13 @@ const getEmail = (access_token, res) => {
       });
 
       resFromGitHub.on('end', () => {
-        res.writeHead(200);
-        resBodyFromGitHub = JSON.parse(resBodyFromGitHub);
-        resBodyFromGitHub.forEach((el, idx) => {
-          res.write(`mails[${idx}]: ${el.email}\n`);
+        const arrayedResBodyFromGitHub = JSON.parse(resBodyFromGitHub);
+        const emails = [];
+
+        arrayedResBodyFromGitHub.forEach((el) => {
+          emails.push(el.email);
         });
-        resolve(res);
+        resolve(emails);
       });
     });
 
@@ -56,6 +57,49 @@ const getEmail = (access_token, res) => {
     reqToGitHub.end();
   });
 };
+
+const getAccessToken = (code) => {
+  return new Promise((resolve, reject) => {
+    let resBodyFromGitHub = '';
+
+    const reqBodyToGitHub = queryString.stringify({
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code: code
+    });
+
+    const reqToGitHubOptions = {
+      protocol: 'https:',
+      hostname: 'github.com',
+      port: 443,
+      path: '/login/oauth/access_token',
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/x-www-form-urlencoded',
+        'Content-Length': reqBodyToGitHub.length,
+        'User-Agent': 'pure-node-oauth',
+      },
+    };
+
+    const reqToGitHub = https.request(reqToGitHubOptions, (resFromGitHub) => {
+      resFromGitHub.setEncoding('utf8');
+      resFromGitHub.on('data', (chunk) => {
+        resBodyFromGitHub += chunk;
+      });
+
+      resFromGitHub.on('end', () => {
+        const accessToken = queryString.parse(resBodyFromGitHub).access_token;
+        resolve(accessToken);
+      });
+    });
+
+    reqToGitHub.on('error', (e) => {
+      reject(e);
+    });
+
+    reqToGitHub.write(reqBodyToGitHub);
+    reqToGitHub.end();
+  });
 }
 
 const server = http.createServer((req, res) => {
@@ -73,32 +117,17 @@ const server = http.createServer((req, res) => {
       break;
     case '/callback':
 
-      const requestBody = queryString.stringify({
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code: queryString.parse(reqURL.query).code
-      });
+      const tempCode = queryString.parse(reqURL.query).code;
 
-
-      const requestClient = https.request('https://github.com/login/oauth/access_token', {
-        method: 'POST',
-        hostname: 'github.com',
-        port: 443,
-        path: '/login/oauth/access_token',
-        headers: {
-          "Content-type": "application/x-www-form-urlencoded",
-          'Content-Length': requestBody.length
-        },
-      }, (responseClient) => {
-        responseClient.setEncoding('utf8');
-        responseClient.on('data', (d) => {
-          getEmail(queryString.parse(d).access_token, res).then(() => {
-            res.end();
-          });
+      getAccessToken(tempCode).then((accessToken) => {
+        return getEmail(accessToken);
+      }).then((emails) => {
+        res.writeHead(200);
+        emails.forEach((el, idx) => {
+          res.write(`emails[${idx}]: ${el}\n`);
         })
+        res.end();
       });
-
-      requestClient.write(requestBody);
       break;
     default:
       res.writeHead(404, { 'Content-Type': 'text/plain' });
