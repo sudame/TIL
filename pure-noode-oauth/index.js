@@ -38,15 +38,12 @@ function getEmail(access_token, res) {
     });
 
     resFromGitHub.on('end', () => {
-      data = JSON.parse(data);
-      let emails = [];
-      data.forEach(el => {
-        emails.push(el.email);
-      });
-
-
       res.writeHead(200);
-      res.end(emails.toString());
+      data = JSON.parse(data);
+      data.forEach((el, idx) => {
+        res.write(`mails[${idx}]: ${el.email}\n`);
+      });
+      res.end();
     });
   });
 
