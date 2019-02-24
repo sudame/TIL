@@ -9,7 +9,7 @@ const CLIENT_ID = keys.clientID;
 const CLIENT_SECRET = keys.clientSecret;
 
 
-function getEmail(access_token, res) {
+const getEmail = (access_token, res) => {
   return new Promise((resolve, reject) => {
     let resBodyFromGitHub = '';
 
@@ -55,6 +55,7 @@ function getEmail(access_token, res) {
     reqToGitHub.write(reqBodyToGitHub);
     reqToGitHub.end();
   });
+};
 }
 
 const server = http.createServer((req, res) => {
