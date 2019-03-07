@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "watch": true,
+    "target": "es6",
+    "outDir": "./dist",
+    "pretty": true
+  }, 
+  "files": [
+    "./src/main.ts"
+  ]
+}
