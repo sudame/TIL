@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:sudame_todo_bloc/helpers/base_bloc.dart';
+
 import 'package:rxdart/subjects.dart';
 import 'package:sudame_todo_bloc/models/task.dart';
 
-class TaskBloc {
+class TaskBloc implements BaseBloc {
   // State
   List<Task> _taskList = [];
   int _editingTask = 0;
@@ -28,6 +30,7 @@ class TaskBloc {
   Sink<bool> get setTaskIsCompleted => _setIsCompletedController.sink;
 
   void _setEditing(int taskId) {
+    print(taskId);
     // ToDo: implements method.
   }
 
@@ -59,5 +62,15 @@ class TaskBloc {
     _setIsCompletedController.stream.listen((bool isCompleted) {
       _setIsCompleted(isCompleted);
     });
+  }
+
+  // when disposed
+  @override
+  void dispose() async {
+    _taskListSubject.close();
+    _setEditingController.close();
+    _setTitleController.close();
+    _setDescriptionController.close();
+    _setIsCompletedController.close();
   }
 }
