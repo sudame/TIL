@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:widget_of_the_week/helpers/home_fab.dart';
 
 class MySafeArea extends StatefulWidget {
   MySafeArea({Key key}) : super(key: key);
@@ -48,6 +49,7 @@ class _MySafeAreaState extends State<MySafeArea> {
           ),
         ],
       ),
+      floatingActionButton: BackFAB(),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:widget_of_the_week/helpers/home_fab.dart';
 
 class ExpandedExample extends StatelessWidget {
   ExpandedExample({Key key}) : super(key: key);
@@ -20,6 +21,7 @@ class ExpandedExample extends StatelessWidget {
           _NotExpandedItem(),
         ],
       ),
+      floatingActionButton: BackFAB(),
     );
   }
 }
