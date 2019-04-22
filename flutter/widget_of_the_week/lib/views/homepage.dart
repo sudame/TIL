@@ -22,7 +22,9 @@ class HomePage extends StatelessWidget {
             ),
             RaisedButton(
               child: Text('Expanded'),
-              onPressed: () => {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/Expanded');
+              },
             ),
           ],
         ),
