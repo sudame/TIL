@@ -1,8 +1,8 @@
 class Task {
-  final int id;
-  final String title;
-  final String description;
-  final bool isCompleted;
+  int id;
+  String title;
+  String description;
+  bool isCompleted;
 
   Task({
     this.id,

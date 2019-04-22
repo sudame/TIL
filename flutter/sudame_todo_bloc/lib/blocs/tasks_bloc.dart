@@ -30,20 +30,39 @@ class TaskBloc implements BaseBloc {
   Sink<bool> get setTaskIsCompleted => _setIsCompletedController.sink;
 
   void _setEditing(int taskId) {
-    print(taskId);
-    // ToDo: implements method.
+    taskId = taskId ?? _taskList.length;
+    this._editingTask = taskId;
+    print('[EDITING TASK] $_editingTask');
+    print('_taskList.length == ${_taskList.length}');
+    if (_taskList.length <= _editingTask || (_taskList[_editingTask] == null)) {
+      _taskList.add(
+        new Task(
+          id: _editingTask,
+          title: '',
+          description: '',
+        ),
+      );
+    }
+
+    _taskListSubject.add(_taskList);
   }
 
   void _setTitle(String title) {
-    // ToDo: implements method.
+    _taskList[_editingTask].title = title;
+
+    _taskListSubject.add(_taskList);
   }
 
   void _setDescription(String description) {
-    // ToDo: implements method.
+    _taskList[_editingTask].description = description;
+
+    _taskListSubject.add(_taskList);
   }
 
   void _setIsCompleted(bool isCompleted) {
-    // ToDo: implements method.
+    _taskList[_editingTask].isCompleted = isCompleted;
+
+    _taskListSubject.add(_taskList);
   }
 
   TaskBloc() {
