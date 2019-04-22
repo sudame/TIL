@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomePage(),
         '/SafeArea': (context) => MySafeArea(),
         '/Expanded': (context) => ExpandedExample(),
+        '/Wrap': (context) => WrapExample(),
       },
     );
   }

@@ -26,6 +26,12 @@ class HomePage extends StatelessWidget {
                 Navigator.pushNamed(context, '/Expanded');
               },
             ),
+            RaisedButton(
+              child: Text('Wrap'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/Wrap');
+              },
+            ),
           ],
         ),
       ),
