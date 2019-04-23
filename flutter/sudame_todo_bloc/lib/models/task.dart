@@ -6,9 +6,9 @@ class Task {
   final int id;
 
   Task({
-    @required this.title,
-    @required this.isCompleted,
-    @required this.id,
+    @required this.title = '',
+    @required this.isCompleted = false,
+    @required this.id = null,
   });
 
   Task copyWith({String title, bool isCompleted, int id}) {
@@ -18,4 +18,10 @@ class Task {
       id: id ?? this.id,
     );
   }
+
+  @override
+  bool operator ==(other) => this.id == other.id;
+
+  @override
+  int get hashCode => this.id;
 }

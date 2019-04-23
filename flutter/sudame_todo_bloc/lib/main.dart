@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
 import 'package:sudame_todo_bloc/views/screens/homepage.dart';
+import 'package:bloc_provider/bloc_provider.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+      BlocProvider<TasksBloc>(
+        creator: (_context, _bag) => TasksBloc(),
+        child: MyApp(),
+      ),
+    );
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.

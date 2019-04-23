@@ -1,13 +1,19 @@
 import 'dart:async';
-import 'dart:collection';
+
+import 'package:bloc_provider/bloc_provider.dart';
 
 import 'package:rxdart/subjects.dart';
 import 'package:sudame_todo_bloc/models/task.dart';
-import 'package:sudame_todo_bloc/models/taskList.dart';
 
-class TasksBloc {
-  static TaskList _taskList = new TaskList(
-      editingTaskId: 0, taskList: UnmodifiableListView([]), maxID: 0);
+// when update task list,
+// 1. set task that will be updated with setTaskEditing stream.
+// 2. set title or isCompleted with set{title,isCompleted} stream.
+
+class TasksBloc implements Bloc {
+  // task list
+  static List<Task> _taskList = [];
+  // index of editing task
+  static int _editingId = 0;
 
   // input stream controller
   final StreamController<int> _editingController = StreamController();
@@ -15,15 +21,18 @@ class TasksBloc {
   final StreamController<bool> _isCompletedController = StreamController();
 
   // output stream controller
-  final BehaviorSubject<TaskList> _outputController =
+  final BehaviorSubject<List<Task>> _outputController =
       BehaviorSubject.seeded(_taskList);
 
+  // input stream
   Sink<int> get setTaskEditing => _editingController.sink;
   Sink<String> get setTaskTitle => _titleController.sink;
   Sink<bool> get setTaskIsCompleted => _isCompletedController.sink;
 
-  Stream<TaskList> get getTaskList => _outputController.stream;
+  // output stream
+  Stream<List<Task>> get getTaskList => _outputController.stream;
 
+  // constructor
   TasksBloc() {
     _editingController.stream.listen((int id) {
       _setEditing(id);
@@ -36,21 +45,47 @@ class TasksBloc {
     });
   }
 
-  void _setEditing(int id) {
-    _taskList = _taskList.setEditing(id);
+  // local functions
+  void _setEditing(int id) async {
+    await new Future.delayed(new Duration(seconds: 3));
+
+    // when create new task, set id = -1.
+    if (id < 0) {
+      _editingId = _createTask();
+    } else {
+      _editingId = id;
+    }
   }
 
   void _setTitle(String title) {
-    final int index = _taskList.getTaskIndex();
-    final Task _task = _taskList[index].copyWith(title: title);
-    _taskList = _taskList.update(_task);
+    _taskList[_editingId] = _taskList[_editingId].copyWith(
+      title: title,
+    );
     _outputController.add(_taskList);
   }
 
   void _setIsCompleted(bool isCompleted) {
-    final int index = _taskList.getTaskIndex();
-    final Task _task = _taskList[index].copyWith(isCompleted: isCompleted);
-    _taskList = _taskList.update(_task);
+    _taskList[_editingId] = _taskList[_editingId].copyWith(
+      isCompleted: isCompleted,
+    );
     _outputController.add(_taskList);
+  }
+
+  int _createTask() {
+    final int _id = _taskList.length;
+    _taskList.add(new Task(
+      title: '',
+      isCompleted: false,
+      id: _id,
+    ));
+    return _id;
+  }
+
+  @override
+  void dispose() async {
+    await _editingController.close();
+    await _titleController.close();
+    await _isCompletedController.close();
+    await _outputController.close();
   }
 }
