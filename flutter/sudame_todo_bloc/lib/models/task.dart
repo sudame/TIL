@@ -11,11 +11,11 @@ class Task {
     @required this.id,
   });
 
-  Task copyWith({String title, bool isCompleted}) {
+  Task copyWith({String title, bool isCompleted, int id}) {
     return new Task(
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
-      id: this.id,
+      id: id ?? this.id,
     );
   }
 }

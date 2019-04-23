@@ -11,6 +11,10 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: TaskList(),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {},
+      ),
     );
   }
 }
