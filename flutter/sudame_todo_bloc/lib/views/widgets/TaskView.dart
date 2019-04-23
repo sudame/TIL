@@ -1,7 +1,12 @@
+// flutter packages
 import 'package:flutter/material.dart';
+
+// 3rd party packages
+import 'package:bloc_provider/bloc_provider.dart';
+
+// self packages
 import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
 import 'package:sudame_todo_bloc/models/task.dart';
-import 'package:bloc_provider/bloc_provider.dart';
 
 class TaskView extends StatelessWidget {
   final Task _task;
@@ -16,9 +21,16 @@ class TaskView extends StatelessWidget {
         children: <Widget>[
           Checkbox(
             value: _task.isCompleted,
-            onChanged: (bool newVal) {
-              _bloc.setTaskEditing.add(_task.id);
-              _bloc.setTaskIsCompleted.add(newVal);
+            onChanged: (bool isCompleted) {
+              // チェックボックスが押されたらTaskを更新する
+              _bloc.setTask.add(
+                TaskEvent<bool>(
+                  action: TaskEventAction.update,
+                  task: _task.copyWith(
+                    isCompleted: isCompleted,
+                  ),
+                ),
+              );
             },
           ),
           SizedBox(

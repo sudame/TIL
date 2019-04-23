@@ -1,12 +1,13 @@
-import 'dart:collection';
-
+// flutter packages
 import 'package:flutter/material.dart';
-import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
-import 'TaskView.dart';
-import 'package:sudame_todo_bloc/models/task.dart';
+
+// 3rd party packages
 import 'package:bloc_provider/bloc_provider.dart';
 
-const tasks = ['hoge'];
+// self packages
+import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
+import 'package:sudame_todo_bloc/models/task.dart';
+import 'package:sudame_todo_bloc/views/widgets/widgets.dart';
 
 class TaskListView extends StatelessWidget {
   @override

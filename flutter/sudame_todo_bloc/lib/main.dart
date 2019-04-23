@@ -1,7 +1,12 @@
+// flutter packages
 import 'package:flutter/material.dart';
+
+// 3rd party packages
+import 'package:bloc_provider/bloc_provider.dart';
+
+// self packages
 import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
 import 'package:sudame_todo_bloc/views/screens/homepage.dart';
-import 'package:bloc_provider/bloc_provider.dart';
 
 void main() => runApp(
       BlocProvider<TasksBloc>(

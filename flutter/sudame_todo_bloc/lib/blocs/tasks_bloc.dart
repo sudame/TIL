@@ -1,91 +1,83 @@
+// dart lang
 import 'dart:async';
 
+// 3rd party packages
 import 'package:bloc_provider/bloc_provider.dart';
-
 import 'package:rxdart/subjects.dart';
+
+// self packages
 import 'package:sudame_todo_bloc/models/task.dart';
 
-// when update task list,
-// 1. set task that will be updated with setTaskEditing stream.
-// 2. set title or isCompleted with set{title,isCompleted} stream.
+// CRUDアクションの設定(Readは無し)
+enum TaskEventAction {
+  create,
+  update,
+  delete,
+}
 
+// TaskをC(R)UDする指示を出すイベントクラス
+class TaskEvent<T> {
+  final TaskEventAction action;
+  final Task task;
+
+  TaskEvent({this.action, this.task});
+}
+
+// BLoC本体
 class TasksBloc implements Bloc {
-  // task list
+  // Taskのリスト
   static List<Task> _taskList = [];
-  // index of editing task
-  static int _editingId = 0;
 
-  // input stream controller
-  final StreamController<int> _editingController = StreamController();
-  final StreamController<String> _titleController = StreamController();
-  final StreamController<bool> _isCompletedController = StreamController();
+  // 入力Streamの制御
+  final StreamController<TaskEvent> _inputController = StreamController();
 
-  // output stream controller
+  // 出力Streamの制御
   final BehaviorSubject<List<Task>> _outputController =
       BehaviorSubject.seeded(_taskList);
 
-  // input stream
-  Sink<int> get setTaskEditing => _editingController.sink;
-  Sink<String> get setTaskTitle => _titleController.sink;
-  Sink<bool> get setTaskIsCompleted => _isCompletedController.sink;
+  // 入力Stream
+  Sink<TaskEvent> get setTask => _inputController.sink;
 
-  // output stream
+  // 出力Stream
   Stream<List<Task>> get getTaskList => _outputController.stream;
 
-  // constructor
-  TasksBloc() {
-    _editingController.stream.listen((int id) {
-      _setEditing(id);
-    });
-    _titleController.stream.listen((String title) {
-      _setTitle(title);
-    });
-    _isCompletedController.stream.listen((bool isCompleted) {
-      _setIsCompleted(isCompleted);
-    });
-  }
-
-  // local functions
-  void _setEditing(int id) async {
-    await new Future.delayed(new Duration(seconds: 3));
-
-    // when create new task, set id = -1.
-    if (id < 0) {
-      _editingId = _createTask();
-    } else {
-      _editingId = id;
-    }
-  }
-
-  void _setTitle(String title) {
-    _taskList[_editingId] = _taskList[_editingId].copyWith(
-      title: title,
-    );
-    _outputController.add(_taskList);
-  }
-
-  void _setIsCompleted(bool isCompleted) {
-    _taskList[_editingId] = _taskList[_editingId].copyWith(
-      isCompleted: isCompleted,
-    );
-    _outputController.add(_taskList);
-  }
-
-  int _createTask() {
+  // Taskを新規で作る
+  void _createTask({Task task}) {
     final int _id = _taskList.length;
     _taskList.add(new Task(
-      title: '',
-      isCompleted: false,
+      title: task.title ?? '',
+      isCompleted: task.isCompleted ?? false,
       id: _id,
     ));
-    return _id;
   }
 
+  // Taskの更新
+  void _update(Task task) {
+    _taskList[task.id] = task;
+  }
+
+  // 入力Streamのリスナ
+  void _taskEventListener(TaskEvent e) {
+    if (e.action == TaskEventAction.create) {
+      // createアクションだった場合
+      _createTask(task: e.task);
+    } else if (e.action == TaskEventAction.update) {
+      _update(e.task);
+    }
+    // Taskのリスト更新後、出力Streamに流し込む
+    _outputController.add(_taskList);
+  }
+
+  // コンストラクタ
+  TasksBloc() {
+    // 入力Streamをリッスンしてリスナを登録
+    _inputController.stream.listen(_taskEventListener);
+  }
+
+  // ステートが破棄された場合、Streamを閉じて破棄する
   @override
   void dispose() async {
-    await _editingController.close();
-    await _titleController.close();
-    await _isCompletedController.close();
+    await _inputController.close();
     await _outputController.close();
   }
 }
