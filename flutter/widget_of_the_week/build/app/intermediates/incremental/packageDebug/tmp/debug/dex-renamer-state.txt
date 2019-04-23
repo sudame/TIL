@@ -1,0 +1,4 @@
+#Mon Apr 22 15:04:34 JST 2019
+base.0=/Users/sudame/workspace/TIL/flutter/widget_of_the_week/build/app/intermediates/transforms/dexMerger/debug/0
+path.0=classes.dex
+renamed.0=classes.dex
