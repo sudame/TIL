@@ -61,6 +61,25 @@ class TaskView extends StatelessWidget {
                       _task.isCompleted ? TextDecoration.lineThrough : null,
                 ),
               ),
+              Expanded(
+                child: Container(),
+              ),
+              GestureDetector(
+                onTap: () {
+                  print('delete!');
+                  _bloc.setTask.add(
+                    TaskEvent(
+                      action: TaskEventAction.delete,
+                      task: _task,
+                    ),
+                  );
+                },
+                child: Icon(
+                  Icons.delete_forever,
+                  size: 30,
+                  color: Colors.black26,
+                ),
+              ),
             ],
           ),
         ),

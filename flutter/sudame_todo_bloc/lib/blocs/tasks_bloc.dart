@@ -56,13 +56,22 @@ class TasksBloc implements Bloc {
     _taskList[task.id] = task;
   }
 
+  // Taskの削除
+  void _delete(Task task) {
+    _taskList.removeWhere((t) => task == t);
+  }
+
   // 入力Streamのリスナ
   void _taskEventListener(TaskEvent e) {
     if (e.action == TaskEventAction.create) {
       // createアクションだった場合
       _createTask(task: e.task);
     } else if (e.action == TaskEventAction.update) {
+      // updateアクションだった場合
       _update(e.task);
+    } else if (e.action == TaskEventAction.delete) {
+      // deleteアクションだった場合
+      _delete(e.task);
     }
     // Taskのリスト更新後、出力Streamに流し込む
     _outputController.add(_taskList);
