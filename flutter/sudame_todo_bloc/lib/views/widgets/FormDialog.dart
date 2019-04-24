@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 
 // 3rd party packages
 import 'package:bloc_provider/bloc_provider.dart';
+import 'package:flutter/services.dart';
 
 // self packages
 import 'package:sudame_todo_bloc/models/task.dart';
 import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
 
-class FormDialog extends StatelessWidget {
+class FormDialog extends StatefulWidget {
   static void showFormDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -17,9 +18,18 @@ class FormDialog extends StatelessWidget {
   }
 
   @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return _FormDialogState();
+  }
+}
+
+class _FormDialogState extends State {
+  final TextEditingController _titleEditingController =
+      new TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController _titleEditingController =
-        new TextEditingController();
     TasksBloc _bloc = BlocProvider.of<TasksBloc>(context);
 
     return AlertDialog(
@@ -31,6 +41,7 @@ class FormDialog extends StatelessWidget {
           Text('タイトル'),
           TextField(
             controller: _titleEditingController,
+            textInputAction: TextInputAction.none,
           ),
         ],
       ),
@@ -42,7 +53,7 @@ class FormDialog extends StatelessWidget {
               TaskEvent(
                 action: TaskEventAction.create,
                 task: Task(
-                  title: _titleEditingController.value.text,
+                  title: _titleEditingController.text,
                 ),
               ),
             );

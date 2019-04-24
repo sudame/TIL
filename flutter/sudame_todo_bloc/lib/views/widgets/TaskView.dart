@@ -15,35 +15,50 @@ class TaskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TasksBloc _bloc = BlocProvider.of<TasksBloc>(context);
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-      child: Row(
-        children: <Widget>[
-          Checkbox(
-            value: _task.isCompleted,
-            onChanged: (bool isCompleted) {
-              // チェックボックスが押されたらTaskを更新する
-              _bloc.setTask.add(
-                TaskEvent<bool>(
-                  action: TaskEventAction.update,
-                  task: _task.copyWith(
-                    isCompleted: isCompleted,
-                  ),
+    return GestureDetector(
+      onTap: () {
+        print('TAPPED!');
+      },
+      onLongPress: () {
+        print('LONG PRESSED!');
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Checkbox(
+                value: _task.isCompleted,
+                onChanged: (bool isCompleted) {
+                  // チェックボックスが押されたらTaskを更新する
+                  _bloc.setTask.add(
+                    TaskEvent<bool>(
+                      action: TaskEventAction.update,
+                      task: _task.copyWith(
+                        isCompleted: isCompleted,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(
+                width: 8.0,
+              ),
+              Text(
+                _task.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  decoration:
+                      _task.isCompleted ? TextDecoration.lineThrough : null,
                 ),
-              );
-            },
+              ),
+            ],
           ),
-          SizedBox(
-            width: 8.0,
-          ),
-          Text(
-            _task.title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              decoration: _task.isCompleted ? TextDecoration.lineThrough : null,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
