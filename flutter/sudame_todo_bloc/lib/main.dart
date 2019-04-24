@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // 3rd party packages
 import 'package:bloc_provider/bloc_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 // self packages
 import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
@@ -21,6 +22,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('ja', ''), // Japanese
+      ],
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),

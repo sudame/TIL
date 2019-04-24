@@ -20,7 +20,17 @@ class TaskListView extends StatelessWidget {
         return ListView.builder(
           itemCount: snap.data?.length ?? 0,
           itemBuilder: (BuildContext context, int index) {
-            return TaskView(task: snap.data[index]);
+            return Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    width: 2.0,
+                    color: Theme.of(context).dividerColor,
+                  ),
+                ),
+              ),
+              child: TaskView(task: snap.data[index]),
+            );
           },
         );
       },

@@ -7,6 +7,7 @@ import 'package:bloc_provider/bloc_provider.dart';
 // self packages
 import 'package:sudame_todo_bloc/blocs/tasks_bloc.dart';
 import 'package:sudame_todo_bloc/models/task.dart';
+import 'package:sudame_todo_bloc/views/widgets/widgets.dart';
 
 class TaskView extends StatelessWidget {
   final Task _task;
@@ -20,10 +21,12 @@ class TaskView extends StatelessWidget {
         print('TAPPED!');
       },
       onLongPress: () {
+        FormDialog.showFormDialog(context, task: _task);
         print('LONG PRESSED!');
       },
       child: Padding(
-        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+        padding: const EdgeInsets.only(
+            top: 8.0, bottom: 8.0, left: 12.0, right: 12.0),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.transparent,
@@ -51,7 +54,9 @@ class TaskView extends StatelessWidget {
               Text(
                 _task.title,
                 style: TextStyle(
+                  color: _task.isCompleted ? Colors.black26 : Colors.black,
                   fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
                   decoration:
                       _task.isCompleted ? TextDecoration.lineThrough : null,
                 ),
