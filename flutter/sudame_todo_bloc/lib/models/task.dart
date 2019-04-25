@@ -19,6 +19,22 @@ class Task {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'iscompleted': isCompleted,
+      'id': id,
+    };
+  }
+
+  static Task fromMap(Map<String, dynamic> map) {
+    return Task(
+      title: map['title'],
+      isCompleted: map['iscompleted'] == 1,
+      id: map['id'],
+    );
+  }
+
   // idが同じであれば同じTaskであるとみなす
   // ==演算子の上書き
   @override

@@ -7,6 +7,7 @@ import 'package:rxdart/subjects.dart';
 
 // self packages
 import 'package:sudame_todo_bloc/models/task.dart';
+import 'package:sudame_todo_bloc/repositories/task_io.dart';
 
 // CRUDアクションの設定(Readは無し)
 enum TaskEventAction {
@@ -25,15 +26,16 @@ class TaskEvent<T> {
 
 // BLoC本体
 class TasksBloc implements Bloc {
-  // Taskのリスト
-  static List<Task> _taskList = [];
+  // Task I/O
+  // SQLiteとのやり取り
+  final TaskRepository tr = new TaskRepository();
 
   // 入力Streamの制御
   final StreamController<TaskEvent> _inputController = StreamController();
 
   // 出力Streamの制御
   final BehaviorSubject<List<Task>> _outputController =
-      BehaviorSubject.seeded(_taskList);
+      BehaviorSubject.seeded([]);
 
   // 入力Stream
   Sink<TaskEvent> get setTask => _inputController.sink;
@@ -41,28 +43,31 @@ class TasksBloc implements Bloc {
   // 出力Stream
   Stream<List<Task>> get getTaskList => _outputController.stream;
 
+  void _initBloc() async {
+    _outputController.add(await tr.tasks);
+  }
+
   // Taskを新規で作る
-  void _createTask({Task task}) {
-    final int _id = _taskList.length;
-    _taskList.add(new Task(
+  void _createTask({Task task}) async {
+    await tr.insertTask(Task(
       title: task.title ?? '',
       isCompleted: task.isCompleted ?? false,
-      id: _id,
+      id: null,
     ));
   }
 
   // Taskの更新
-  void _update(Task task) {
-    _taskList[task.id] = task;
+  void _update(Task task) async {
+    await tr.updateTask(task);
   }
 
   // Taskの削除
-  void _delete(Task task) {
-    _taskList.removeWhere((t) => task == t);
+  void _delete(Task task) async {
+    await tr.deleteTask(task);
   }
 
   // 入力Streamのリスナ
-  void _taskEventListener(TaskEvent e) {
+  void _taskEventListener(TaskEvent e) async {
     if (e.action == TaskEventAction.create) {
       // createアクションだった場合
       _createTask(task: e.task);
@@ -74,13 +79,16 @@ class TasksBloc implements Bloc {
       _delete(e.task);
     }
     // Taskのリスト更新後、出力Streamに流し込む
-    _outputController.add(_taskList);
+    _outputController.add(await tr.tasks);
   }
 
   // コンストラクタ
   TasksBloc() {
     // 入力Streamをリッスンしてリスナを登録
     _inputController.stream.listen(_taskEventListener);
+
+    // 初期化
+    _initBloc();
   }
 
   // ステートが破棄された場合、Streamを閉じて破棄する
